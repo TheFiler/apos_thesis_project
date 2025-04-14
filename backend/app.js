@@ -58,8 +58,8 @@ export default apostrophe({
     // The main form module
     '@apostrophecms/form': {
       options: {
-        recaptchaSecret: '6LclqwQrAAAAAIkSDfG0RWVDl66cFZ9x-24eyo3A',
-        recaptchaSite: '6LclqwQrAAAAACgtab2cRWce3_h5QQqD8yQArtFN'
+        recaptchaSecret: '<key>',
+        recaptchaSite: '<key>'
       }
     },
     // The form widget module, allowing editors to add forms to content areas
