@@ -1,0 +1,85 @@
+---
+import Navigation from "./Navigation.astro";
+
+const { aposData } = Astro.props;
+const mainNav = aposData.home?._children || [];
+const headerGroup = aposData.global?.headerGroup;
+const sublineWidget = headerGroup?.headerSubline?.items?.[0];
+const badgeWidget = headerGroup?.headerBadge?.items?.[0];
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || 'http://localhost:3000'; // fallback for local dev
+
+function formatNavItem(page) {
+  if (!page) return null;
+
+  const children = page._children?.map(formatNavItem).filter(Boolean) || [];
+  const isCurrent = page._url === aposData.page?._url;
+  const isChildActive = children.some((child) => child.active);
+
+  return {
+    title: page.title || "",
+    url: page._url || "#",
+    active: isCurrent || isChildActive,
+    children,
+  };
+}
+
+const navItems = mainNav.map(formatNavItem).filter(Boolean);
+const homeTitle = aposData.home?.title || "Home";
+const homeUrl = aposData.home?._url || "/";
+const currentUrl = aposData.page?._url || "/";
+---
+
+{(sublineWidget || badgeWidget) && (
+  <div class="header-bar px-4 py-2">
+    <div class="columns is-multiline is-vcentered is-variable is-1">
+      <div class="column is-12-mobile is-11-tablet">
+        {sublineWidget && (
+          <div class="html-widget" set:html={sublineWidget.code} />
+        )}
+      </div>
+
+      <div class="column is-12-mobile is-1-tablet has-text-centered">
+        {badgeWidget && (
+          <img src={`${baseUrl}${badgeWidget._image[0].attachment._urls.original}`} alt="Header badge" />
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+<Navigation
+  navItems={navItems}
+  homeTitle={homeTitle}
+  homeUrl={homeUrl}
+  currentUrl={currentUrl}
+/>
+
+<style>
+.header-bar {
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem 1.5rem;
+
+  .site-branding {
+    h1, h2, h3, p {
+      margin: 0;
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+  }
+
+  img {
+    display: inline-block;
+    max-height: 60px;
+  }
+
+  @media (max-width: 768px) {
+    .column.is-2,
+    .column.is-1 {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+</style>

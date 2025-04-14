@@ -1,0 +1,89 @@
+---
+const { navItems, homeTitle, homeUrl, currentUrl } =
+    Astro.props;
+
+import "../styles/navigation.scss";
+---
+
+<nav
+    class="navbar has-shadow is-white"
+    role="navigation"
+    aria-label="main navigation"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a
+                class={`navbar-item has-text-weight-bold ${currentUrl === "/" ? "is-active" : ""}`}
+                href={homeUrl}
+            >
+                {homeTitle}
+            </a>
+            <a
+                role="button"
+                class="navbar-burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="mainNavbar"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="mainNavbar" class="navbar-menu">
+            <div class="navbar-start">
+                {
+                    navItems.map((item) => {
+                        const isCurrentOrChildActive =
+                            item.active ||
+                            item.children.some((child) => child.active);
+
+                        return (
+                            <div
+                                class={[
+                                    "navbar-item",
+                                    item.children.length > 0 &&
+                                        "has-dropdown is-hoverable",
+                                    isCurrentOrChildActive && "is-active",
+                                ]
+                                    .filter(Boolean)
+                                    .join(" ")}
+                            >
+                                <a href={item.url} class="navbar-link">
+                                    {item.title}
+                                </a>
+
+                                {item.children.length > 0 && (
+                                    <div class="navbar-dropdown">
+                                        {item.children.map((child) => (
+                                            <a
+                                                href={child.url}
+                                                class={`navbar-item ${child.active ? "is-active" : ""}`}
+                                            >
+                                                {child.title}
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })
+                }
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+        const burger = document.querySelector(".navbar-burger");
+        const menu = document.getElementById(burger.dataset.target);
+
+        burger.addEventListener("click", () => {
+            burger.classList.toggle("is-active");
+            menu.classList.toggle("is-active");
+        });
+    });
+</script>

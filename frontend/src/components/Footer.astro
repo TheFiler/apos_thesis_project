@@ -1,0 +1,130 @@
+---
+const { aposData } = Astro.props;
+const consent = aposData.global?.consentGroup || {};
+const footerGroup = aposData.global?.footerGroup || {};
+const footerBadge = footerGroup?.footerBadge?.items?.[0]?._image[0]?.attachment._urls.original || {};
+const footerEmail = footerGroup?.footerEmail?.items?.[0]?._image[0]?.attachment._urls.original || {};
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || "http://localhost:3000"; // fallback for local dev
+const companyInfo = footerGroup?.footerCompanyInfo?.items?.[0];
+const phoneInfo = footerGroup?.footerPhoneInfo?.items?.[0];
+const footerLinks = footerGroup?.footerLinks?.items?.[0];
+
+const {
+  enableConsentBanner,
+  consentMessage,
+  acceptLabel,
+  learnMoreLabel,
+  learnMoreUrl,
+} = consent;
+
+---
+
+<footer class="footer certec-footer has-background-light" role="contentinfo">
+  <!-- CookieConsent CDN -->
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js"
+  ></script>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css"
+  />
+
+  <div class="container">
+    <div class="footer-content">
+      <div class="columns is-variable is-6 is-vcentered">
+        <!-- Left: Logo or Branding -->
+        <div class="column is-one-third has-text-centered-mobile">
+          {
+            companyInfo && (
+              <div class="html-widget" set:html={companyInfo.code} />
+            )
+          }
+          {
+            footerEmail &&
+            <img
+            src={`${baseUrl}${footerEmail}`}
+            alt="Footer Email"
+          />
+          }
+          
+        </div>
+
+        <!-- Center: Contact Info -->
+        <div class="column is-one-third has-text-centered">
+          {phoneInfo && <div class="html-widget" set:html={phoneInfo.code} />}
+        </div>
+
+        <!-- Right: Badge or Links -->
+        <div class="column is-one-third has-text-centered">
+          { footerBadge &&
+          <img
+            src={`${baseUrl}${footerBadge}`}
+            alt="Footer badge"
+          />
+          }
+        </div>
+      </div>
+      <div class="columns is-variable is-6 is-vcentered">
+        <div class="column has-text-centered py-0">
+          {
+            footerLinks && (
+              <div class="html-widget" set:html={footerLinks.code} />
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {
+    enableConsentBanner && (
+      <div
+        set:html={`<script>
+      window.addEventListener("load", function () {
+        window.cookieconsent.initialise({
+          palette: {
+            popup: { background: "#000" },
+            button: { background: "#f1d600", text: "#000" }
+          },
+          theme: "classic",
+          content: {
+            message: "${consentMessage}",
+            dismiss: "${acceptLabel}",
+            link: "${learnMoreLabel}",
+            href: "${learnMoreUrl}"
+          }
+        });
+      });
+    </script>`}
+      />
+    )
+  }
+</footer>
+
+<style>
+  .certec-footer {
+    padding: 2rem 1.5rem;
+    background-color: #0070c0 !important;
+
+    .footer-title {
+      font-family: tahoma, arial, helvetica, sans-serif;
+      color: white;
+      text-transform: uppercase;
+      margin-bottom: 0;
+    }
+
+    .footer-info {
+      font-size: 1rem;
+      line-height: 1.4;
+      color: #333;
+    }
+  }
+
+  .footer-content {
+    max-width: 950px;
+    margin: 0 auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+</style>
